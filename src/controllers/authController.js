@@ -1,6 +1,38 @@
 import { generateNonce, SiweMessage } from 'siwe';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import { NodeOAuthClient } from '@atproto/oauth-client-node';
+import { pendingLinked } from '../services/blueskyOAuth.js';
+
+// These stores keep track of the temporary "handshake" data
+const stateStore = new Map();
+const sessionStore = new Map();
+
+export const oauthClient = new NodeOAuthClient({
+  clientMetadata: {
+    client_name: 'DopaCoin',
+    // In dev, this must match your backend URL exactly
+    client_id: 'https://legwarmer-dried-casino.ngrok-free.dev/api/auth/client-metadata.json',
+    client_uri: process.env.CLIENT_URL, // e.g., http://localhost:5173
+    redirect_uris: ['https://legwarmer-dried-casino.ngrok-free.dev/api/auth/bsky/callback'],
+    scope: 'atproto',
+    grant_types: ['authorization_code', 'refresh_token'],
+    response_types: ['code'],
+    application_type: 'web',
+    token_endpoint_auth_method: 'none',
+    dpop_bound_access_tokens: true,
+  },
+  stateStore: {
+    set: async (key, val) => { stateStore.set(key, val) },
+    get: async (key) => stateStore.get(key),
+    del: async (key) => { stateStore.delete(key) },
+  },
+  sessionStore: {
+    set: async (sub, val) => { sessionStore.set(sub, val) },
+    get: async (sub) => sessionStore.get(sub),
+    del: async (sub) => { sessionStore.delete(sub) },
+  },
+});
 
 // Instantiate Prisma Client
 const prisma = new PrismaClient();
@@ -101,4 +133,70 @@ export const getProfile = async (req, res) => {
 export const logout = (req, res) => {
   res.clearCookie('token');
   res.json({ message: "Logged out successfully" });
+};
+
+// --- 5. Bluesky OAuth: Init ---
+export const initBskyOAuth = async (req, res) => {
+  try {
+    const url = await oauthClient.authorize('https://bsky.social', {  // ✅ full URL, not a handle
+      scope: 'atproto transition:generic',
+      state: req.user.userId
+    });
+    
+    res.json({ success: true, url: url.toString() });
+  } catch (error) {
+    console.error("❌ OAuth Init Error:", error);
+    res.status(500).json({ error: "Failed to initialize Bluesky login" });
+  }
+};
+
+// --- 6. Bluesky OAuth: Callback & Link ---
+export const bskyOAuthCallback = async (req, res) => {
+  try {
+    const params = new URLSearchParams(req.query);
+    
+    // 1. Process the callback (signatures/state verified by the library)
+    const { session, state: userId } = await oauthClient.callback(params);
+
+    // session.did is the verified identity, e.g. "did:plc:abc123"
+    // Resolve it to a handle via Bluesky's API
+    const profileRes = await fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=${session.did}`);
+    const profile = await profileRes.json();
+    const verifiedHandle = profile.handle; // e.g. "yourname.bsky.social"
+
+    // 2. Check if handle is already linked
+    const existingHandle = await prisma.user.findUnique({
+      where: { bskyHandle: verifiedHandle }
+    });
+
+    if (existingHandle && existingHandle.id !== userId) {
+      return res.send(`
+        <script>
+          alert("This Bluesky handle is already linked to another wallet.");
+          window.close();
+        </script>
+      `);
+    }
+
+    // 3. Update the database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { bskyHandle: verifiedHandle }
+    });
+
+    // Flag this user as done
+    pendingLinked.add(userId);
+
+    // 4. Close the popup
+    res.send(`<script>window.close();</script>`);
+
+  } catch (error) {
+    console.error("❌ Bluesky Linking Error:", error);
+    res.send(`
+      <script>
+        alert("Failed to link Bluesky account.");
+        window.close();
+      </script>
+    `);
+  }
 };

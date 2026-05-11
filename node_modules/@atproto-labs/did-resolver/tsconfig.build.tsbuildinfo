@@ -1,0 +1,1 @@
+{"root":["./src/create-did-resolver.ts","./src/did-cache-memory.ts","./src/did-cache.ts","./src/did-method.ts","./src/did-resolver-base.ts","./src/did-resolver-common.ts","./src/did-resolver.ts","./src/index.ts","./src/methods.ts","./src/util.ts","./src/methods/plc.ts","./src/methods/web.ts"],"version":"5.8.2"}

@@ -1,0 +1,125 @@
+import { z } from 'zod';
+/**
+ * @note non string parameters will be converted from their string
+ * representation since oauth request parameters are typically sent as URL
+ * encoded form data or URL encoded query string.
+ * @see {@link https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest | OIDC}
+ */
+export declare const oauthAuthorizationRequestParametersSchema: z.ZodObject<{
+    client_id: z.ZodString;
+    state: z.ZodOptional<z.ZodString>;
+    redirect_uri: z.ZodOptional<z.ZodEffects<z.ZodString, `http://[::1]${string}` | "http://127.0.0.1" | `http://127.0.0.1#${string}` | `http://127.0.0.1?${string}` | `http://127.0.0.1/${string}` | `http://127.0.0.1:${string}` | `https://${string}` | `${string}.${string}:/${string}`, string>>;
+    scope: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
+    response_type: z.ZodEnum<["code", "token", "none", "code id_token token", "code id_token", "code token", "id_token token", "id_token"]>;
+    code_challenge: z.ZodOptional<z.ZodString>;
+    code_challenge_method: z.ZodOptional<z.ZodEnum<["S256", "plain"]>>;
+    dpop_jkt: z.ZodOptional<z.ZodString>;
+    response_mode: z.ZodOptional<z.ZodEnum<["query", "fragment", "form_post"]>>;
+    nonce: z.ZodOptional<z.ZodString>;
+    max_age: z.ZodOptional<z.ZodEffects<z.ZodNumber, number, unknown>>;
+    claims: z.ZodOptional<z.ZodEffects<z.ZodRecord<z.ZodEnum<["userinfo", "id_token"]>, z.ZodRecord<z.ZodEnum<["auth_time", "nonce", "acr", "name", "family_name", "given_name", "middle_name", "nickname", "preferred_username", "gender", "picture", "profile", "website", "birthdate", "zoneinfo", "locale", "updated_at", "email", "email_verified", "phone_number", "phone_number_verified", "address"]>, z.ZodUnion<[z.ZodLiteral<null>, z.ZodObject<{
+        essential: z.ZodOptional<z.ZodBoolean>;
+        value: z.ZodOptional<z.ZodUnion<[z.ZodString, z.ZodNumber, z.ZodBoolean]>>;
+        values: z.ZodOptional<z.ZodArray<z.ZodUnion<[z.ZodString, z.ZodNumber, z.ZodBoolean]>, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        value?: string | number | boolean | undefined;
+        values?: (string | number | boolean)[] | undefined;
+        essential?: boolean | undefined;
+    }, {
+        value?: string | number | boolean | undefined;
+        values?: (string | number | boolean)[] | undefined;
+        essential?: boolean | undefined;
+    }>]>>>, Partial<Record<"id_token" | "userinfo", Partial<Record<"email" | "auth_time" | "nonce" | "acr" | "name" | "family_name" | "given_name" | "middle_name" | "nickname" | "preferred_username" | "gender" | "picture" | "profile" | "website" | "birthdate" | "zoneinfo" | "locale" | "updated_at" | "email_verified" | "phone_number" | "phone_number_verified" | "address", {
+        value?: string | number | boolean | undefined;
+        values?: (string | number | boolean)[] | undefined;
+        essential?: boolean | undefined;
+    } | null>>>>, unknown>>;
+    login_hint: z.ZodOptional<z.ZodString>;
+    ui_locales: z.ZodOptional<z.ZodString>;
+    id_token_hint: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, `${string}.${string}.${string}`, string>>;
+    display: z.ZodOptional<z.ZodEnum<["page", "popup", "touch", "wap"]>>;
+    prompt: z.ZodOptional<z.ZodEnum<["none", "login", "consent", "select_account", "create"]>>;
+    authorization_details: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodObject<{
+        type: z.ZodString;
+        locations: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, `${string}:${string}`, string>, "many">>;
+        actions: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        datatypes: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        identifier: z.ZodOptional<z.ZodString>;
+        privileges: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        type: string;
+        locations?: `${string}:${string}`[] | undefined;
+        actions?: string[] | undefined;
+        datatypes?: string[] | undefined;
+        identifier?: string | undefined;
+        privileges?: string[] | undefined;
+    }, {
+        type: string;
+        locations?: string[] | undefined;
+        actions?: string[] | undefined;
+        datatypes?: string[] | undefined;
+        identifier?: string | undefined;
+        privileges?: string[] | undefined;
+    }>, "many">, {
+        type: string;
+        locations?: `${string}:${string}`[] | undefined;
+        actions?: string[] | undefined;
+        datatypes?: string[] | undefined;
+        identifier?: string | undefined;
+        privileges?: string[] | undefined;
+    }[], unknown>>;
+}, "strip", z.ZodTypeAny, {
+    client_id: string;
+    response_type: "code" | "none" | "token" | "code id_token token" | "code id_token" | "code token" | "id_token token" | "id_token";
+    scope?: string | undefined;
+    redirect_uri?: `http://[::1]${string}` | "http://127.0.0.1" | `http://127.0.0.1#${string}` | `http://127.0.0.1?${string}` | `http://127.0.0.1/${string}` | `http://127.0.0.1:${string}` | `https://${string}` | `${string}.${string}:/${string}` | undefined;
+    authorization_details?: {
+        type: string;
+        locations?: `${string}:${string}`[] | undefined;
+        actions?: string[] | undefined;
+        datatypes?: string[] | undefined;
+        identifier?: string | undefined;
+        privileges?: string[] | undefined;
+    }[] | undefined;
+    nonce?: string | undefined;
+    state?: string | undefined;
+    code_challenge?: string | undefined;
+    code_challenge_method?: "S256" | "plain" | undefined;
+    dpop_jkt?: string | undefined;
+    response_mode?: "query" | "fragment" | "form_post" | undefined;
+    max_age?: number | undefined;
+    claims?: Partial<Record<"id_token" | "userinfo", Partial<Record<"email" | "auth_time" | "nonce" | "acr" | "name" | "family_name" | "given_name" | "middle_name" | "nickname" | "preferred_username" | "gender" | "picture" | "profile" | "website" | "birthdate" | "zoneinfo" | "locale" | "updated_at" | "email_verified" | "phone_number" | "phone_number_verified" | "address", {
+        value?: string | number | boolean | undefined;
+        values?: (string | number | boolean)[] | undefined;
+        essential?: boolean | undefined;
+    } | null>>>> | undefined;
+    login_hint?: string | undefined;
+    ui_locales?: string | undefined;
+    id_token_hint?: `${string}.${string}.${string}` | undefined;
+    display?: "page" | "popup" | "touch" | "wap" | undefined;
+    prompt?: "none" | "login" | "consent" | "select_account" | "create" | undefined;
+}, {
+    client_id: string;
+    response_type: "code" | "none" | "token" | "code id_token token" | "code id_token" | "code token" | "id_token token" | "id_token";
+    scope?: string | undefined;
+    redirect_uri?: string | undefined;
+    authorization_details?: unknown;
+    nonce?: string | undefined;
+    state?: string | undefined;
+    code_challenge?: string | undefined;
+    code_challenge_method?: "S256" | "plain" | undefined;
+    dpop_jkt?: string | undefined;
+    response_mode?: "query" | "fragment" | "form_post" | undefined;
+    max_age?: unknown;
+    claims?: unknown;
+    login_hint?: string | undefined;
+    ui_locales?: string | undefined;
+    id_token_hint?: string | undefined;
+    display?: "page" | "popup" | "touch" | "wap" | undefined;
+    prompt?: "none" | "login" | "consent" | "select_account" | "create" | undefined;
+}>;
+/**
+ * @see {oauthAuthorizationRequestParametersSchema}
+ */
+export type OAuthAuthorizationRequestParameters = z.infer<typeof oauthAuthorizationRequestParametersSchema>;
+//# sourceMappingURL=oauth-authorization-request-parameters.d.ts.map

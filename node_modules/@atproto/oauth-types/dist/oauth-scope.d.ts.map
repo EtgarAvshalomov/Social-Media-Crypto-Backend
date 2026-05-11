@@ -1,0 +1,1 @@
+{"version":3,"file":"oauth-scope.d.ts","sourceRoot":"","sources":["../src/oauth-scope.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,CAAC,EAAE,MAAM,KAAK,CAAA;AAIvB,eAAO,MAAM,kBAAkB,QAC+B,CAAA;AAE9D,eAAO,MAAM,YAAY,GAAI,OAAO,MAAM,KAAG,OACb,CAAA;AAEhC;;;;;GAKG;AACH,eAAO,MAAM,gBAAgB,2CAE3B,CAAA;AAEF,MAAM,MAAM,UAAU,GAAG,CAAC,CAAC,KAAK,CAAC,OAAO,gBAAgB,CAAC,CAAA"}

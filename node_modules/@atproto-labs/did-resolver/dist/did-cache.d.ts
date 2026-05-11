@@ -1,0 +1,15 @@
+import { Did, DidDocument } from '@atproto/did';
+import { CachedGetter, SimpleStore } from '@atproto-labs/simple-store';
+import { DidMethod, ResolveDidOptions } from './did-method.js';
+import { DidResolver, ResolvedDocument } from './did-resolver.js';
+export type { DidMethod, ResolveDidOptions, ResolvedDocument };
+export type DidCache = SimpleStore<Did, DidDocument>;
+export type DidResolverCachedOptions = {
+    cache?: DidCache;
+};
+export declare class DidResolverCached<M extends string = string> implements DidResolver<M> {
+    protected readonly getter: CachedGetter<Did, DidDocument>;
+    constructor(resolver: DidResolver<M>, cache?: DidCache);
+    resolve<D extends Did>(did: D, options?: ResolveDidOptions): Promise<ResolvedDocument<D, M>>;
+}
+//# sourceMappingURL=did-cache.d.ts.map

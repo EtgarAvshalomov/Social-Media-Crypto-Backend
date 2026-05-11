@@ -1,0 +1,1 @@
+{"version":3,"file":"oidc-authorization-error-response.d.ts","sourceRoot":"","sources":["../src/oidc-authorization-error-response.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,CAAC,EAAE,MAAM,KAAK,CAAA;AAEvB;;GAEG;AACH,eAAO,MAAM,oCAAoC,8OAmB/C,CAAA;AAEF,MAAM,MAAM,8BAA8B,GAAG,CAAC,CAAC,KAAK,CAClD,OAAO,oCAAoC,CAC5C,CAAA"}

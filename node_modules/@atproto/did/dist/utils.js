@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.matchesIdentifier = matchesIdentifier;
+function matchesIdentifier(did, id, candidate) {
+    // optimized implementation of:
+    // return candidate === `#${id}` || candidate === `${did}#${id}`
+    return candidate.charCodeAt(0) === 35 // '#'
+        ? candidate.length === id.length + 1 && candidate.endsWith(id)
+        : candidate.length === id.length + 1 + did.length &&
+            candidate.charCodeAt(did.length) === 35 && // '#'
+            candidate.startsWith(did) &&
+            candidate.endsWith(id);
+}
+//# sourceMappingURL=utils.js.map

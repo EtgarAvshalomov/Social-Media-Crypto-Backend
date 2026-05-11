@@ -1,0 +1,1 @@
+{"root":["./src/atproto-doh-handle-resolver.ts","./src/atproto-handle-resolver.ts","./src/cached-handle-resolver.ts","./src/create-handle-resolver.ts","./src/handle-resolver-error.ts","./src/index.ts","./src/types.ts","./src/xrpc-handle-resolver.ts","./src/internal-resolvers/dns-handle-resolver.ts","./src/internal-resolvers/well-known-handler-resolver.ts"],"version":"5.8.2"}

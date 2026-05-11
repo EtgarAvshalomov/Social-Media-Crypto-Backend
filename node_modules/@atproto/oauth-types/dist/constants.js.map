@@ -1,0 +1,1 @@
+{"version":3,"file":"constants.js","sourceRoot":"","sources":["../src/constants.ts"],"names":[],"mappings":";;;AAAa,QAAA,gCAAgC,GAC3C,wDAAwD,CAAA","sourcesContent":["export const CLIENT_ASSERTION_TYPE_JWT_BEARER =\n  'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'\n"]}

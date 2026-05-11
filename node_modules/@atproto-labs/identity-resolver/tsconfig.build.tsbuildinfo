@@ -1,0 +1,1 @@
+{"root":["./src/atproto-identity-resolver.ts","./src/constants.ts","./src/create-identity-resolver.ts","./src/identity-resolver-error.ts","./src/identity-resolver.ts","./src/index.ts","./src/util.ts"],"version":"5.8.2"}

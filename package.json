@@ -17,6 +17,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@atproto/api": "^0.19.6",
+    "@atproto/oauth-client-node": "^0.3.17",
     "@prisma/client": "^6.19.1",
     "bcrypt": "^6.0.0",
     "compression": "^1.8.0",
@@ -30,8 +32,12 @@
     "express-rate-limit": "^7.5.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
+    "luxon": "^3.7.2",
+    "ngrok": "^5.0.0-beta.2",
     "openai": "^4.0.0",
-    "siwe": "^3.0.0"
+    "pingram": "^1.0.5",
+    "siwe": "^3.0.0",
+    "twilio": "^6.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10",

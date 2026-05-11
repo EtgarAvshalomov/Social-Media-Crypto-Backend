@@ -1,0 +1,1 @@
+{"version":3,"file":"constants.js","sourceRoot":"","sources":["../src/constants.ts"],"names":[],"mappings":";;;AAAA;;GAEG;AACU,QAAA,YAAY,GAAG,OAAO,CAAA","sourcesContent":["/**\n * Per ATProto spec (OpenID uses RS256)\n */\nexport const FALLBACK_ALG = 'ES256'\n"]}

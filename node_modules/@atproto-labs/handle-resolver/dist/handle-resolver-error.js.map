@@ -1,0 +1,1 @@
+{"version":3,"file":"handle-resolver-error.js","sourceRoot":"","sources":["../src/handle-resolver-error.ts"],"names":[],"mappings":";;;AAAA,MAAa,mBAAoB,SAAQ,KAAK;IAA9C;;QACE;;;;mBAAO,qBAAqB;WAAA;IAC9B,CAAC;CAAA;AAFD,kDAEC","sourcesContent":["export class HandleResolverError extends Error {\n  name = 'HandleResolverError'\n}\n"]}

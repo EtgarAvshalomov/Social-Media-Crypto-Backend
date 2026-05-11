@@ -1,0 +1,1 @@
+{"version":3,"file":"identity-resolver-error.js","sourceRoot":"","sources":["../src/identity-resolver-error.ts"],"names":[],"mappings":";;;AAAA,MAAa,qBAAsB,SAAQ,KAAK;IAAhD;;QACE;;;;mBAAO,uBAAuB;WAAA;IAChC,CAAC;CAAA;AAFD,sDAEC","sourcesContent":["export class IdentityResolverError extends Error {\n  name = 'IdentityResolverError'\n}\n"]}

@@ -37,15 +37,29 @@ export const oauthClient = new NodeOAuthClient({
 // Instantiate Prisma Client
 const prisma = new PrismaClient();
 
+const SIWE_NONCE_COOKIE = 'siwe_nonce';
+const siweNonceCookieBase = () => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  path: '/',
+});
+
 // --- 1. Get Nonce ---
 export const getNonce = async (req, res) => {
+  const nonce = generateNonce();
+  res.cookie(SIWE_NONCE_COOKIE, nonce, {
+    ...siweNonceCookieBase(),
+    maxAge: 10 * 60 * 1000,
+  });
   res.setHeader('Content-Type', 'text/plain');
-  res.send(generateNonce());
+  res.send(nonce);
 };
 
 // --- 2. Verify & Login ---
 export const verifySignature = async (req, res) => {
   try {
+    console.log(req.headers['content-type'], req.body)
     const { message, signature } = req.body;
 
     console.log("-----------------------------------------");
@@ -53,11 +67,19 @@ export const verifySignature = async (req, res) => {
     console.log("1. Received Message:", message);
     console.log("2. Received Signature:", signature);
 
+    const expectedNonce = req.cookies?.[SIWE_NONCE_COOKIE];
+    if (!expectedNonce) {
+      return res.status(401).json({
+        success: false,
+        error: 'Missing or expired sign-in challenge. Request a new nonce.',
+      });
+    }
+
     // 1. Reconstruct the message
     const siweMessage = new SiweMessage(message);
 
-    // 2. Verify the signature
-    const result = await siweMessage.verify({ signature });
+    // 2. Verify the signature (nonce must match the one issued with GET /nonce)
+    const result = await siweMessage.verify({ signature, nonce: expectedNonce });
 
     // 3. DEBUG: Check exact failure reason
     if (!result.success) {
@@ -72,6 +94,8 @@ export const verifySignature = async (req, res) => {
     
     console.log("✅ Signature Verified! Address:", result.data.address);
     const fields = result.data;
+
+    res.clearCookie(SIWE_NONCE_COOKIE, siweNonceCookieBase());
 
     // 4. Database Logic
     let user = await prisma.user.findUnique({

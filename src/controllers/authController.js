@@ -79,7 +79,15 @@ export const verifySignature = async (req, res) => {
     const siweMessage = new SiweMessage(message);
 
     // 2. Verify the signature (nonce must match the one issued with GET /nonce)
-    const result = await siweMessage.verify({ signature, nonce: expectedNonce });
+    let result;
+    try {
+      result = await siweMessage.verify({ signature, nonce: expectedNonce });
+    } catch (err) {
+      return res.status(401).json({
+        success: false,
+        error: err?.error?.message || err?.message || 'Invalid signature',
+      });
+    }
 
     // 3. DEBUG: Check exact failure reason
     if (!result.success) {

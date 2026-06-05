@@ -10,9 +10,9 @@ export const pendingLinked = new Set();
 export const oauthClient = new NodeOAuthClient({
   clientMetadata: {
     client_name: 'DopaCoin',
-    client_id: `${BASE_URL}/api/auth/client-metadata.json`,  // ✅ https required
+    client_id: `${BASE_URL}/api/auth/client-metadata.json`,
     client_uri: BASE_URL,
-    redirect_uris: [`${BASE_URL}/api/auth/bsky/callback`],   // ✅ no localhost
+    redirect_uris: [`${BASE_URL}/api/auth/bsky/callback`],
     scope: 'atproto transition:generic',
     grant_types: ['authorization_code', 'refresh_token'],
     response_types: ['code'],

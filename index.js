@@ -46,5 +46,5 @@ app.use('/api/wallet', walletRoutes);
 console.log(`Step ${++step}: Wallet routes mounted`);
 
 app.listen(PORT, () => {
-    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

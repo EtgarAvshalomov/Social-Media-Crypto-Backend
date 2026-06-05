@@ -23,12 +23,10 @@ router.post('/sendFundsToWallet', requireAuth, async (req, res) => {
       return res.status(403).json({ error: 'Phone verification required to withdraw.' });
     }
 
-    // -------------------------------------------------------
     // Calculate claimable amount from 'available' records only
     // Posts: 10 DOPA each, capped at 5 posts/day (50 max/day)
     // Replies: 1 DOPA each, capped at 25/day
     // Likes: 1 DOPA each, capped at 25/day
-    // -------------------------------------------------------
     const cutoff = getStartOfTodayIsrael();
 
     const pendingPosts   = await prisma.userPost.findMany({  where: { userId, status: 'available' } });
@@ -44,9 +42,7 @@ router.post('/sendFundsToWallet', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'No pending DOPA to claim.' });
     }
 
-    // -------------------------------------------------------
     // Send tokens on-chain
-    // -------------------------------------------------------
     const provider = new ethers.JsonRpcProvider('https://rpc-amoy.polygon.technology/');
     const wallet   = new ethers.Wallet(process.env.ADMIN_PRIVATE_KEY, provider);
 
@@ -59,9 +55,7 @@ router.post('/sendFundsToWallet', requireAuth, async (req, res) => {
     const tx = await dopaContract.transfer(user.address, amountToTransfer);
     await tx.wait();
 
-    // -------------------------------------------------------
     // Mark everything as claimed
-    // -------------------------------------------------------
     await prisma.userPost.updateMany({
       where: { userId, status: 'available' },
       data:  { status: 'claimed' },
@@ -75,9 +69,7 @@ router.post('/sendFundsToWallet', requireAuth, async (req, res) => {
       data:  { status: 'claimed' },
     });
 
-    // -------------------------------------------------------
     // Update user balance: move amount from available → claimed
-    // -------------------------------------------------------
     await prisma.user.update({
       where: { id: userId },
       data: {

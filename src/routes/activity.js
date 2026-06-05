@@ -7,14 +7,11 @@ import { DateTime } from 'luxon';
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Helper to get exactly midnight in Israel time
 function getStartOfTodayIsrael() {
   return DateTime.now().setZone('Asia/Jerusalem').startOf('day').toJSDate();
 }
 
-// ==========================================================
-// 🔄 1. REFRESH ACTIVITY (Sync & Apply Caps)
-// ==========================================================
+// REFRESH ACTIVITY (Sync & Apply Caps)
 router.get('/refreshActivity', requireAuth, async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -41,7 +38,7 @@ router.get('/refreshActivity', requireAuth, async (req, res) => {
     const cutoffTime = getStartOfTodayIsrael();
     const newActivity = { posts: [], replies: [], likes: [] };
 
-    // --- A. FETCH FEED (Posts & Replies) ---
+    // FETCH FEED (Posts & Replies)
     let feedCursor;
     let fetchingFeed = true;
     while (fetchingFeed) {
@@ -50,7 +47,7 @@ router.get('/refreshActivity', requireAuth, async (req, res) => {
         if (!data.feed || data.feed.length === 0) break;
 
         for (const item of data.feed) {
-          // Skip reposts
+
           if (item.reason && item.reason.$type === 'app.bsky.feed.defs#reasonRepost') continue;
 
           const activityDate = new Date(item.post.record.createdAt);
@@ -59,10 +56,6 @@ router.get('/refreshActivity', requireAuth, async (req, res) => {
           const bskyUri = item.post.uri;
           const text    = item.post.record.text;
 
-          // ✅ FIX 1: Use item.post.record.reply as the sole source of truth.
-          // item.reply (AppView hydration) is unreliable and may be absent.
-          // If the record has a reply ref, it IS a reply — no further check needed
-          // beyond confirming it's not a self-reply (replying to your own thread).
           if (item.post.record.reply) {
             // item.post.record.reply.parent.uri = at://did:.../app.bsky.feed.post/xxx
             const parentAuthorDid = item.post.record.reply.parent.uri.split('/')[2];
@@ -79,7 +72,7 @@ router.get('/refreshActivity', requireAuth, async (req, res) => {
       } catch (err) { fetchingFeed = false; }
     }
 
-    // --- B. FETCH LIKES (PDS Direct Routing) ---
+    // FETCH LIKES (PDS Direct Routing)
     try {
       const plcRes  = await fetch(`https://plc.directory/${targetUserDid}`);
       const didDoc  = await plcRes.json();
@@ -101,10 +94,7 @@ router.get('/refreshActivity', requireAuth, async (req, res) => {
         for (const record of data.records) {
           const likeDate = new Date(record.value.createdAt);
           if (likeDate >= cutoffTime) {
-            // ✅ FIX 2: Key on the URI of the POST that was liked, NOT the like
-            // record's own URI. When a user unlikes and relikes, Bluesky creates a
-            // new like record (new UUID) but the liked post URI stays the same.
-            // Deduplicating on the liked post URI prevents double-rewarding.
+
             const likedPostUri       = record.value.subject.uri;
             const likedPostAuthorDid = likedPostUri.split('/')[2];
 
@@ -122,7 +112,7 @@ router.get('/refreshActivity', requireAuth, async (req, res) => {
       }
     } catch (err) { console.error('Likes fetch error:', err.message); }
 
-    // --- C. PROCESS & SAVE TO DATABASE ---
+    // PROCESS & SAVE TO DATABASE
     newActivity.posts.reverse();
     newActivity.replies.reverse();
     newActivity.likes.reverse();
@@ -149,7 +139,6 @@ router.get('/refreshActivity', requireAuth, async (req, res) => {
 
     // Process Replies (Max 25/day = 25 coins)
     for (const reply of newActivity.replies) {
-      // bskyUri here is the post's own AT URI — already a stable dedup key
       const exists = await prisma.userReply.findUnique({ where: { bskyUri: reply.bskyUri } });
       if (!exists) {
         const status = (todayRepliesCount >= 25) ? 'cap_hit' : 'available';
@@ -163,7 +152,6 @@ router.get('/refreshActivity', requireAuth, async (req, res) => {
 
     // Process Likes (Max 25/day = 25 coins)
     for (const like of newActivity.likes) {
-      // bskyUri is now the liked POST's URI — stable across unlike/relike cycles
       const exists = await prisma.userLike.findUnique({ where: { bskyUri: like.bskyUri } });
       if (!exists) {
         const status = (todayLikesCount >= 25) ? 'cap_hit' : 'available';
@@ -175,7 +163,7 @@ router.get('/refreshActivity', requireAuth, async (req, res) => {
       }
     }
 
-    // --- D. UPDATE USER BALANCES ---
+    // UPDATE USER BALANCES
     const trueEarnedPosts   = await prisma.userPost.count({  where: { userId, status: { in: ['available', 'claimed'] }, createdAt: { gte: cutoffTime } } }) * 10;
     const trueEarnedReplies = await prisma.userReply.count({ where: { userId, status: { in: ['available', 'claimed'] }, createdAt: { gte: cutoffTime } } }) * 1;
     const trueEarnedLikes   = await prisma.userLike.count({  where: { userId, status: { in: ['available', 'claimed'] }, createdAt: { gte: cutoffTime } } }) * 1;
@@ -199,10 +187,7 @@ router.get('/refreshActivity', requireAuth, async (req, res) => {
   }
 });
 
-
-// ==========================================================
-// 📊 2. GET ACTIVITY (Dashboard Data)
-// ==========================================================
+// GET ACTIVITY (Dashboard Data)
 router.get('/getActivity', requireAuth, async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -246,8 +231,6 @@ router.get('/getActivity', requireAuth, async (req, res) => {
       .slice(0, 50);
 
     const formattedActivity = rawActivity.map(item => {
-      // ✅ FIX 3: Use the _type tag we stamped at query time — no more duck-typing
-      // on bskyUri string contents (which was unreliable and caused misclassification).
       let type, coins, text;
       if (item._type === 'post') {
         type = 'post'; coins = 10; text = `"${item.text}"`;

@@ -6,8 +6,6 @@ import { Pingram } from 'pingram';
 const router = express.Router();
 const prisma  = new PrismaClient();
 
-// Add to your .env:
-//   PINGRAM_API_KEY=your_key_here
 const pingram = new Pingram({
   apiKey: process.env.PINGRAM_API_KEY,
 });

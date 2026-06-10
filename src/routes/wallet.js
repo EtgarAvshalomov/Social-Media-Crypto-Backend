@@ -43,7 +43,9 @@ router.post('/sendFundsToWallet', requireAuth, async (req, res) => {
     }
 
     // Send tokens on-chain
-    const provider = new ethers.JsonRpcProvider('https://rpc-amoy.polygon.technology/');
+    const provider = new ethers.JsonRpcProvider('https://rpc-amoy.polygon.technology/', 80002, {
+      staticNetwork: true,
+    });
     const wallet   = new ethers.Wallet(process.env.ADMIN_PRIVATE_KEY, provider);
 
     const abi = ['function transfer(address to, uint256 amount) returns (bool)'];

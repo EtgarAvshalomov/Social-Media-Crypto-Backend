@@ -1,6 +1,6 @@
 import { NodeOAuthClient } from '@atproto/oauth-client-node';
 
-const BASE_URL = 'https://legwarmer-dried-casino.ngrok-free.dev';
+const BASE_URL = 'https://social-media-crypto-backend.onrender.com';
 
 const stateStore = new Map();
 const sessionStore = new Map();

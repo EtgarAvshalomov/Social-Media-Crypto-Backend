@@ -43,7 +43,7 @@ router.post('/sendFundsToWallet', requireAuth, async (req, res) => {
     }
 
     // Send tokens on-chain
-    const provider = new ethers.JsonRpcProvider('https://rpc-amoy.polygon.technology/', 80002, {
+    const provider = new ethers.JsonRpcProvider(process.env.AMOY_RPC_URL, 80002, {
       staticNetwork: true,
     });
     const wallet   = new ethers.Wallet(process.env.ADMIN_PRIVATE_KEY, provider);

@@ -14,7 +14,7 @@ model User {
   address      String     @unique
   role         String     @default("user")
   createdAt    DateTime   @default(now()) @map("created_at")
-  phoneNumber  String     @default("") @map("phone_number")
+  phoneNumber  String?     @unique @default("") @map("phone_number")
   bskyHandle   String?    @unique @map("bsky_handle")
   totalEarned  Float      @default(0) @map("total_earned")
   earnedTodayFromPosts  Float      @default(0) @map("earned_today_from_posts")
